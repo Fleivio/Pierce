@@ -1,0 +1,57 @@
+cabal-version:      3.0
+name:               Pierce
+version:            0.1.0.0
+license:            BSD-3-Clause
+author:             flavio
+maintainer:         flavioborinjunior@gmail.com
+build-type:         Simple
+
+common warnings
+    ghc-options: -Wall
+
+library tapl
+    import : warnings
+
+    build-depends: 
+        base ^>=4.18.3.0
+        , array
+        , mtl
+
+    build-tool-depends: happy:happy, alex:alex
+
+    hs-source-dirs: tapl
+
+    other-modules:
+        ArithUnt.Lexer
+        ArithUnt.Parser
+        ArithUnt.Ast
+        ArithUnt.Evaluator
+
+        LambUnt.Lexer
+        LambUnt.Parser
+        LambUnt.Named
+        LambUnt.Converter
+        LambUnt.Bruijn
+        LambUnt.Evaluator
+
+
+    exposed-modules: 
+        ArithUnt.Test
+        LambUnt.Test
+
+
+    default-language: Haskell2010
+
+executable Pierce
+    import:           warnings
+    main-is:          Main.hs
+
+    -- other-modules:
+
+    -- other-extensions:
+
+    build-depends:    base ^>=4.18.3.0, tapl
+
+    hs-source-dirs:   app
+
+    default-language: Haskell2010
