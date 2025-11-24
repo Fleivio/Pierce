@@ -1,7 +1,7 @@
 {
-module LambUnt.Parser(parseString) where
-import LambUnt.Lexer
-import LambUnt.Named
+module Parser(parseString) where
+import Lexer
+import Named
 }
 
 %name parseTokens

@@ -1,6 +1,6 @@
 module Main where
 
-import LambUnt.Test
+import Test
 
 main :: IO ()
 main = test

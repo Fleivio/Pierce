@@ -1,4 +1,4 @@
-module LambUnt.Bruijn(BTerm(..), normalOrder, callByVal, callByName, freeVars) where
+module Bruijn(BTerm(..), normalOrder, callByVal, callByName, freeVars) where
 import Data.List (delete)
 
 

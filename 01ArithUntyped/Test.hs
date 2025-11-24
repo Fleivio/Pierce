@@ -1,8 +1,8 @@
-module ArithUnt.Test(test) where
+module Test(test) where
 
-import ArithUnt.Parser
-import ArithUnt.Lexer
-import ArithUnt.Evaluator
+import Parser
+import Lexer
+import Evaluator
 
 test :: IO ()
 test = do

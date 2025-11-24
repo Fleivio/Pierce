@@ -1,7 +1,7 @@
-module LambUnt.Converter(toNamed, toBruijn) where
+module Converter(toNamed, toBruijn) where
 
-import LambUnt.Named as Named
-import LambUnt.Bruijn
+import Named as Named
+import Bruijn
 import Data.List (subsequences)
 import Control.Monad.State
 

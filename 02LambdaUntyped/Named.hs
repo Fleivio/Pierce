@@ -1,4 +1,4 @@
-module LambUnt.Named(Term(..), normalOrder, callByVal, callByName, freeVars, boundVars) where
+module Named(Term(..), normalOrder, callByVal, callByName, freeVars, boundVars) where
 import Data.List
 
 data Term

@@ -1,4 +1,4 @@
-module LambUnt.Evaluator(evalM, evalM_, eval) where
+module Evaluator(evalM, evalM_, eval) where
 
 import Control.Monad.Identity
 import Control.Monad (void)

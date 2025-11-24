@@ -1,5 +1,5 @@
 {
-module LambUnt.Lexer(Token, TokenId(..), alexScanTokens) where
+module Lexer(Token, TokenId(..), alexScanTokens) where
 }
 %wrapper "posn"
 $char = [a-z]

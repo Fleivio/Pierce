@@ -1,11 +1,10 @@
-{-# LANGUAGE TypeApplications #-}
-module LambUnt.Test(test) where
+module Test(test) where
 
-import LambUnt.Parser
-import LambUnt.Converter
-import LambUnt.Evaluator
-import LambUnt.Named as Named
-import LambUnt.Bruijn as Bruijn
+import Parser
+import Converter
+import Evaluator
+import Named as Named
+import Bruijn as Bruijn
 
 import Control.Monad.Writer
 -- import Control.Monad.State

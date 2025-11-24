@@ -1,6 +1,6 @@
-module ArithUnt.Evaluator (smallEval, bigEval, isNumeric) where
+module Evaluator (smallEval, bigEval, isNumeric) where
 
-import ArithUnt.Ast
+import Ast
 
 
 smallEval :: Term -> Term

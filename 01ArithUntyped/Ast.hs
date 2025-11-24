@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use camelCase" #-}
-module ArithUnt.Ast(Term(..)) where
+module Ast(Term(..)) where
 
 data Term 
   = Zero

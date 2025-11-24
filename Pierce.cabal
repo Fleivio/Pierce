@@ -6,52 +6,52 @@ author:             flavio
 maintainer:         flavioborinjunior@gmail.com
 build-type:         Simple
 
-common warnings
-    ghc-options: -Wall
+common general
+  ghc-options: -Wall
+  build-depends:
+    base ^>=4.18.3.0
+    , array
+    , mtl
+  build-tool-depends: happy:happy, alex:alex
 
-library tapl
-    import : warnings
+library 01ArithUntyped
+  import : general
 
-    build-depends: 
-        base ^>=4.18.3.0
-        , array
-        , mtl
+  hs-source-dirs: 01ArithUntyped
 
-    build-tool-depends: happy:happy, alex:alex
+  other-modules:
+    Lexer
+    Parser
+    Ast
+    Evaluator
 
-    hs-source-dirs: tapl
+  exposed-modules: 
+    Test
 
-    other-modules:
-        ArithUnt.Lexer
-        ArithUnt.Parser
-        ArithUnt.Ast
-        ArithUnt.Evaluator
+  default-language: Haskell2010
 
-        LambUnt.Lexer
-        LambUnt.Parser
-        LambUnt.Named
-        LambUnt.Converter
-        LambUnt.Bruijn
-        LambUnt.Evaluator
+library 02LambdaUntyped
+  import : general
 
+  hs-source-dirs: 02LambdaUntyped
 
-    exposed-modules: 
-        ArithUnt.Test
-        LambUnt.Test
+  other-modules:
+    Lexer
+    Parser
+    Named
+    Converter
+    Bruijn
+    Evaluator
 
+  exposed-modules:
+    Test
 
-    default-language: Haskell2010
+  default-language: Haskell2010
+
 
 executable Pierce
-    import:           warnings
+    import:           general
     main-is:          Main.hs
-
-    -- other-modules:
-
-    -- other-extensions:
-
-    build-depends:    base ^>=4.18.3.0, tapl
-
+    build-depends:    base ^>=4.18.3.0, 02LambdaUntyped
     hs-source-dirs:   app
-
     default-language: Haskell2010
