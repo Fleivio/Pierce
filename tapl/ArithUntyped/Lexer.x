@@ -1,5 +1,5 @@
 {
-module Lexer where
+module ArithUntyped.Lexer where
 }
 %wrapper "posn"
 

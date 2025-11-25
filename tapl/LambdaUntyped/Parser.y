@@ -1,7 +1,7 @@
 {
-module Parser(parseString) where
-import Lexer
-import Named
+module LambdaUntyped.Parser(parseString) where
+import LambdaUntyped.Lexer
+import LambdaUntyped.Named
 }
 
 %name parseTokens

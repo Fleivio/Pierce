@@ -1,0 +1,7 @@
+def x = false;
+
+def y = true;
+
+def n = unit;
+
+def main = if x then n else unit;

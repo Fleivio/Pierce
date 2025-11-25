@@ -1,10 +1,10 @@
-module Test(test) where
+module LambdaUntyped.Test(test) where
 
-import Parser
-import Converter
-import Evaluator
-import Named as Named
-import Bruijn as Bruijn
+import LambdaUntyped.Parser
+import LambdaUntyped.Convert 
+import LambdaUntyped.Named as Named
+import LambdaUntyped.Bruijn as Bruijn
+import Common.Evaluator
 
 import Control.Monad.Writer
 -- import Control.Monad.State
@@ -13,8 +13,8 @@ test :: IO ()
 test = do
   let concrete = "(\\y x. y x) (\\z. z x) (\\a. a)"
       pars = parseString concrete
-      brj = toBruijn pars
-      reconv = toNamed brj
+      brj = namedToBruijn pars
+      reconv = bruijnToNamed brj
 
   let t1 = execWriter $ evalM Named.normalOrder (\a -> writer (a, [show a])) pars
       t2 = execWriter $ evalM Bruijn.normalOrder (\a -> writer (a, [show a])) brj

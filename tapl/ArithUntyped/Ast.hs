@@ -1,7 +1,17 @@
-module Evaluator (smallEval, bigEval, isNumeric) where
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
+module ArithUntyped.Ast(Term(..), bigEval, smallEval', isValue, smallEval) where
 
-import Ast
-
+data Term 
+  = Zero
+  | If Term Term Term
+  | Succ Term 
+  | Pred Term 
+  | Is_Zero Term
+  | FF
+  | TT
+  | Stuck
+  deriving(Eq, Show)
 
 smallEval :: Term -> Term
 smallEval term =

@@ -1,5 +1,5 @@
 {
-module Lexer(Token, TokenId(..), alexScanTokens) where
+module LambdaUntyped.Lexer(Token, TokenId(..), alexScanTokens) where
 }
 %wrapper "posn"
 $char = [a-z]

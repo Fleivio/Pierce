@@ -1,34 +1,34 @@
-module Named(Term(..), normalOrder, callByVal, callByName, freeVars, boundVars) where
+module LambdaUntyped.Named(NTerm(..), normalOrder, callByVal, callByName, freeVars, boundVars) where
 import Data.List
 
-data Term
+data NTerm
   = Var String
-  | Abs String Term
-  | App Term Term
+  | Abs String NTerm
+  | App NTerm NTerm
   deriving(Eq)
 
-instance Show Term where
+instance Show NTerm where
   show term =
     case term of
       Var n -> n
       Abs x body -> "(\\" <> x <> ". " <> show body <> ")"
       App t1 t2 -> show t1 <> " " <> show t2
 
-freeVars :: Term -> [String]
+freeVars :: NTerm -> [String]
 freeVars term =
   case term of
     Var n -> pure n
     App t1 t2 -> freeVars t1 ++ freeVars t2
     Abs x body -> x `delete` freeVars body
 
-boundVars :: Term -> [String]
+boundVars :: NTerm -> [String]
 boundVars term =
   case term of
     Var _ -> mempty
     App t1 t2 -> boundVars t1 <> boundVars t2
     Abs x body -> x : boundVars body
 
-alphaConv :: Term -> String -> String -> Term
+alphaConv :: NTerm -> String -> String -> NTerm
 alphaConv term oldName newName =
   case term of
     Var n | n == oldName -> Var newName
@@ -36,11 +36,11 @@ alphaConv term oldName newName =
     App t1 t2 -> alphaConv t1 oldName newName `App` alphaConv t2 oldName newName
     n -> n
 
-genNewName :: Term -> String -> String
+genNewName :: NTerm -> String -> String
 genNewName term name = head $ filter (`notElem` boundVars term) names
   where names = [ replicate factor '~' ++ name | factor <- [1..]]
 
-betaRed :: String -> Term -> Term -> Term
+betaRed :: String -> NTerm -> NTerm -> NTerm
 betaRed name param expr =
   case expr of
     Var n | n == name -> param
@@ -53,11 +53,11 @@ betaRed name param expr =
           in Abs nName $ betaRed name param (alphaConv body x nName)
     n -> n
 
-_etaRed :: Term -> Term
+_etaRed :: NTerm -> NTerm
 _etaRed (Abs x (App f t2)) | Var x == t2 = f
 _etaRed a = a
 
-type Step = Term -> Term
+type Step = NTerm -> NTerm
 
 normalOrder :: Step
 normalOrder  term =
@@ -67,7 +67,7 @@ normalOrder  term =
     App t1 t2 -> normalOrder t1 `App` normalOrder t2
     n -> n
 
-isValue :: Term -> Bool
+isValue :: NTerm -> Bool
 isValue term =
   case term of
     App {} -> False
@@ -88,3 +88,4 @@ callByName term =
     App (Abs x body) targ -> betaRed x targ body
     App t1 t2 -> App (callByName t1) t2
     a -> a
+

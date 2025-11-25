@@ -1,4 +1,4 @@
-module Bruijn(BTerm(..), normalOrder, callByVal, callByName, freeVars) where
+module LambdaUntyped.Bruijn(BTerm(..), normalOrder, callByVal, callByName, freeVars) where
 import Data.List (delete)
 
 
@@ -77,3 +77,4 @@ callByName term =
     BApp (BAbs body) targ -> betaRed targ body
     BApp t1 t2 -> BApp (callByName t1) t2
     a -> a
+

@@ -1,8 +1,8 @@
-module Test(test) where
+module ArithUntyped.Test(test) where
 
-import Parser
-import Lexer
-import Evaluator
+import ArithUntyped.Parser
+import ArithUntyped.Lexer
+import ArithUntyped.Ast
 
 test :: IO ()
 test = do

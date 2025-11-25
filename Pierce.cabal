@@ -8,50 +8,51 @@ build-type:         Simple
 
 common general
   ghc-options: -Wall
+
+
+library tapl
+  import : general
+  
   build-depends:
     base ^>=4.18.3.0
     , array
     , mtl
+  
+  hs-source-dirs: tapl 
+
   build-tool-depends: happy:happy, alex:alex
-
-library 01ArithUntyped
-  import : general
-
-  hs-source-dirs: 01ArithUntyped
+  
+  default-language: Haskell2010
 
   other-modules:
-    Lexer
-    Parser
-    Ast
-    Evaluator
+    Common.Evaluator
+
+    ArithUntyped.Ast
+    ArithUntyped.Lexer
+    ArithUntyped.Parser
+
+    LambdaUntyped.Bruijn
+    LambdaUntyped.Convert
+    LambdaUntyped.Lexer
+    LambdaUntyped.Named
+    LambdaUntyped.Parser
+
+    LambdaTyped.Ast
+    LambdaTyped.Convert
+    LambdaTyped.Typechecker
+    LambdaTyped.Parser
+    LambdaTyped.Lexer
 
   exposed-modules: 
-    Test
-
-  default-language: Haskell2010
-
-library 02LambdaUntyped
-  import : general
-
-  hs-source-dirs: 02LambdaUntyped
-
-  other-modules:
-    Lexer
-    Parser
-    Named
-    Converter
-    Bruijn
-    Evaluator
-
-  exposed-modules:
-    Test
-
-  default-language: Haskell2010
+    ArithUntyped.Test
+    LambdaUntyped.Test
+    LambdaTyped.Test
 
 
 executable Pierce
     import:           general
     main-is:          Main.hs
-    build-depends:    base ^>=4.18.3.0, 02LambdaUntyped
+    build-depends:    base ^>=4.18.3.0, tapl
     hs-source-dirs:   app
     default-language: Haskell2010
+

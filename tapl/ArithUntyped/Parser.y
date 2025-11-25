@@ -1,7 +1,7 @@
 {
-module Parser(parseTokens) where
-import Lexer
-import Ast
+module ArithUntyped.Parser(parseTokens) where
+import ArithUntyped.Lexer
+import ArithUntyped.Ast
 }
 
 %name parseTokens

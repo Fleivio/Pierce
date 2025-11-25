@@ -1,4 +1,4 @@
-module Evaluator(evalM, evalM_, eval) where
+module Common.Evaluator(evalM, evalM_, eval) where
 
 import Control.Monad.Identity
 import Control.Monad (void)
