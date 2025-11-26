@@ -1,5 +1,7 @@
 module LambdaTyped.Ast(Type(..), Term(..)) where
 
+data Meta = Meta Term String Int Int deriving (Eq, Show)
+
 data Type 
   = TyBool
   | TyUnit
