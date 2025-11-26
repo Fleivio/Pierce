@@ -45,7 +45,7 @@ tokens :-
   "|"                  { tokenMk TK_BAR }
 
   $char+               { \i c -> tokenMk (TK_STRING c) i c}
-  $dig+               { \i c -> tokenMk (TK_NUM (read c)) i c}
+  $dig+                { \i c -> tokenMk (TK_NUM (read c)) i c}
   "\n"                 ;
 
   .                    { \i c -> error $ "TOKEN ERROR: " ++ show c ++ "\nAt Position:" ++ show i }
@@ -70,9 +70,9 @@ data TokenId
   | TK_CASE | TK_OF | TK_BAR  
   deriving (Show, Eq)
 
-type Token = TokenId
+type Token = (TokenId, (Int, Int, String))
 
 tokenMk :: TokenId -> AlexPosn -> String -> Token
-tokenMk a _ _ = a
+tokenMk a (AlexPn i j k) lit = (a, (i, j, lit))
 
 } 

@@ -3,77 +3,81 @@ module LambdaTyped.Typechecker(typechecks) where
 
 import LambdaTyped.Ast
 import Control.Monad.RWS
+import Control.Comonad.Identity (Identity)
 
-type TyContext = [(String, Type)]
+type TyContext = [(String, Locator Type)]
 
 type Typechecker a = RWS TyContext [String] () a 
 
-trow :: String -> Typechecker ()
-trow s = tell [s]
+trow :: Meta -> String -> Typechecker ()
+trow m s = tell [s ++ "\n" ++ show m]
 
-trowIf :: Bool -> String -> Typechecker ()
-trowIf True a = trow a
-trowIf _ _ = pure ()
+trowIf :: Meta -> Bool -> String -> Typechecker ()
+trowIf m True a = trow m a
+trowIf m _ _ = pure ()
 
-asAny :: Typechecker a -> Typechecker Type
-asAny t = t >> pure TyAny
+asAny :: Typechecker a -> Typechecker (Locator Type)
+asAny t = t >> pure (atLocal dM TyAny)
 
-typechecks :: Term -> Type
+typechecks :: Locator Term -> Locator Type
 typechecks term = 
   case evalRWS (typeof term) [] () of 
     (a, []) -> a
     (_, errs) -> error $ unlines errs
 
-typeof :: Term -> Typechecker Type
-typeof term =
-  case term of
-    TT -> pure TyBool
-    FF -> pure TyBool
-    UU -> pure TyUnit
-    Numb _ -> pure TyNat
+typeof :: Locator Term -> Typechecker (Locator Type)
+typeof term = let meta = getLocal term in
+  case extract term of
+    TT -> pure (atLocal meta TyBool)
+    FF -> pure (atLocal meta TyBool)
+    UU -> pure (atLocal meta TyUnit)
+    Numb _ -> pure (atLocal meta TyNat)
     If cnd t1 t2 -> do
       condt <- typeof cnd
       t1t <- typeof t1
       t2t <- typeof t2
-      trowIf (condt /= TyBool) "if condition must be boolean"
-      trowIf (t1t /= t2t) "if branches must evaluate to same type"
+      trowIf meta (condt /= atLocal meta TyBool) "if condition must be boolean"
+      trowIf meta (t1t /= t2t) "if branches must evaluate to same type"
       typeof t2
     Var str -> do
       asks (lookup str) >>= \case
-        Nothing -> asAny $ trow ("unknown variable " <> str)
+        Nothing -> asAny $ trow meta ("unknown variable " <> str)
         Just a -> return a 
-    Abs str ty body -> TyFunc ty <$> local ((str,ty):) (typeof body)
+    Abs str ty body -> do
+      l <- local ((str,ty):) (typeof body)
+      pure $ atLocal meta $ TyFunc ty l 
     App t1 t2 -> do
       t1t <- typeof t1
       t2t <- typeof t2
-      case t1t of
-        TyFunc TyAny b -> pure b
-        TyFunc a b -> trowIf (t2t /= a) "function paramether of wrong type"
+      case extract t1t of
+        TyFunc a b -> if extract a == TyAny then pure a
+                      else trowIf meta (t2t /= a) "function paramether of wrong type"
                       >> pure b
-        _ -> asAny $ trow "non-function being applied"
+        _ -> asAny $ trow meta "non-function being applied"
     Let str t1 t2 -> do
       t1t <- typeof t1
       local ((str, t1t):) (typeof t2)
-    Pair t1 t2 -> (:*:) <$> typeof t1 <*> typeof t2
+    Pair t1 t2 -> 
+      atLocal meta (:*:) <$> extract (typeof t1) <*> extract (typeof t2)
     Fst t1 -> do
       typeof t1 >>= \case
         a :*: _ -> pure a
-        _ -> asAny $ trow "non-pair type on fst call"
+        _ -> asAny $ trow meta "non-pair type on fst call"
     Snd t1 -> do
       typeof t1 >>= \case
         _ :*: a -> pure a
-        _ -> asAny $ trow "non-pair type on snd call"
+        _ -> asAny $ trow meta "non-pair type on snd call"
     Sum t1 t2 -> do
       t1t <- typeof t1
       t2t <- typeof t2
-      trowIf (t1t /= TyNat || t2t /= TyNat) "sum of non-naturals"
+      trowIf meta (t1t /= TyNat || t2t /= TyNat) "sum of non-naturals"
       pure TyNat
     Mult t1 t2 -> do
       t1t <- typeof t1
       t2t <- typeof t2
-      trowIf (t1t /= TyNat || t2t /= TyNat) "mult of non-naturals"
+      trowIf meta (t1t /= TyNat || t2t /= TyNat) "mult of non-naturals"
       pure TyNat
     IsZero t -> do
       tt <- typeof t
-      trowIf (tt /= TyNat) "iszero appl to non-natural"
+      trowIf meta (tt /= TyNat) "iszero appl to non-natural"
       pure TyBool

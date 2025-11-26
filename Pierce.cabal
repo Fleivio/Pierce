@@ -17,6 +17,7 @@ library tapl
     base ^>=4.18.3.0
     , array
     , mtl
+    , comonad
   
   hs-source-dirs: tapl 
 

@@ -1,29 +1,125 @@
-module LambdaTyped.Ast(Type(..), Term(..)) where
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE InstanceSigs #-}
+module LambdaTyped.Ast(Type(..), Term(..), (<@>), Locator, Comonad(..), Meta(..), getLocal, dM, atLocal) where
 
-data Meta = Meta Term String Int Int deriving (Eq, Show)
+import Control.Comonad.Env
 
-data Type 
+data Meta 
+  = Meta {
+    literal :: String
+  , line :: Int
+  , row :: Int
+  } deriving (Eq, Show)
+
+dM :: Meta
+dM = Meta { literal = "", line = 0, row = 0 }
+
+atLocal :: Meta -> a (Env Meta) -> Locator a
+atLocal = env
+
+type Locator a = (Env Meta (a (Env Meta)))
+
+getLocal :: Locator a -> Meta
+getLocal = ask
+
+--Env Meta (Term (Env Meta))
+
+data Comonad m => Type m 
   = TyBool
   | TyUnit
   | TyNat
-  | Type :*: Type
-  | TyFunc Type Type
+  | m (Type m) :*: m (Type m)
+  | TyFunc (m (Type m)) (m (Type m))
   | TyAny 
-  deriving(Eq, Show)
 
-data Term
+data Comonad m => Term m
   = TT
   | FF
   | UU
   | Numb Int
-  | Abs String Type Term
-  | App Term Term
-  | Let String Term Term
-  | Pair Term Term
-  | Fst Term | Snd Term 
-  | If Term Term Term
+  | Abs String (m (Type m)) (m (Term m))
+  | App (m (Term m)) (m (Term m))
+  | Let String (m (Term m)) (m (Term m))
+  | Pair (m (Term m)) (m (Term m))
+  | Fst (m (Term m)) | Snd (m (Term m)) 
+  | If (m (Term m)) (m (Term m)) (m (Term m))
   | Var String
-  | Sum Term Term
-  | Mult Term Term
-  | IsZero Term
-  deriving(Eq, Show)
+  | Sum (m (Term m)) (m (Term m))
+  | Mult (m (Term m)) (m (Term m))
+  | IsZero (m (Term m))
+
+instance Comonad m => Show (Type m) where
+  show :: Type m -> String
+  show TyBool = "Bool"
+  show TyUnit = "Unit"
+  show TyNat = "Nat"
+  show TyAny = "Any"
+  show (a :*: b) =
+    let x = extract a
+        y = extract b
+    in "(" ++ show x ++ " * " ++ show y ++ ")"
+  show (TyFunc a b) =
+    let x = extract a
+        y = extract b
+    in "(" ++ show x ++ " -> " ++ show y ++ ")"
+
+instance Comonad m => Eq (Type m) where
+  (==) :: Type m -> Type m -> Bool
+  TyBool == TyBool = True
+  TyUnit == TyUnit = True
+  TyNat == TyNat = True
+  TyAny == TyAny = True
+  (a1 :*: b1) == (a2 :*: b2) =
+    extract a1 == extract a2 && extract b1 == extract b2
+  (TyFunc a1 b1) == (TyFunc a2 b2) =
+    extract a1 == extract a2 && extract b1 == extract b2
+  _ == _ = False
+  
+instance Comonad m => Show (Term m) where
+  show :: Term m -> String
+  show TT = "true"
+  show FF = "false"
+  show UU = "unit"
+  show (Numb n) = show n
+  show (Abs str ty body) =
+    let b = extract body 
+    in "(λ" ++ str ++ ":" ++ show (extract ty) ++ ". " ++ show b ++ ")"
+  show (App t1 t2) =
+    let a = extract t1
+        b = extract t2
+    in "(" ++ show a ++ " " ++ show b ++ ")"
+  show (Let str t1 t2) =
+    let a = extract t1
+        b = extract t2
+    in "(let " ++ str ++ " = " ++ show a ++
+       " in " ++ show b ++ ")"
+  show (Pair t1 t2) =
+    let a = extract t1
+        b = extract t2
+    in "(" ++ show a ++ ", " ++ show b ++ ")"
+  show (Fst t1) =
+    let a = extract t1
+    in "fst " ++ show a
+  show (Snd t1) =
+    let a = extract t1
+    in "snd " ++ show a
+  show (If cnd t1 t2) =
+    let c = extract cnd
+        a = extract t1
+        b = extract t2
+    in "if " ++ show c ++ " then " ++ show a ++
+       " else " ++ show b
+  show (Var str) = str
+  show (Sum t1 t2) =
+    let a = extract t1
+        b = extract t2
+    in "(" ++ show a ++ " + " ++ show b ++ ")"
+  show (Mult t1 t2) =
+    let a = extract t1
+        b = extract t2
+    in "(" ++ show a ++ " * " ++ show b ++ ")"
+  show (IsZero t) =
+    let a = extract t
+    in "iszero " ++ show a
+
+  
