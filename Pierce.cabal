@@ -38,16 +38,16 @@ library tapl
     LambdaUntyped.Named
     LambdaUntyped.Parser
 
-    LambdaTyped.Ast
-    LambdaTyped.Convert
-    LambdaTyped.Typechecker
-    LambdaTyped.Parser
-    LambdaTyped.Lexer
+    LambdaComonad.Ast
+    LambdaComonad.Convert
+    LambdaComonad.Typechecker
+    LambdaComonad.Parser
+    LambdaComonad.Lexer
 
   exposed-modules: 
     ArithUntyped.Test
     LambdaUntyped.Test
-    LambdaTyped.Test
+    LambdaComonad.Test
 
 
 executable Pierce

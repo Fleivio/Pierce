@@ -1,9 +1,9 @@
-module LambdaTyped.Convert (termToNamed, termToBruijn) where
+module LambdaComonad.Convert (termToNamed, termToBruijn) where
 
 import qualified LambdaUntyped.Named as N
 import qualified LambdaUntyped.Bruijn as B
 import LambdaUntyped.Convert
-import LambdaTyped.Ast
+import LambdaComonad.Ast
 
 toChurch :: Int -> N.NTerm
 toChurch k = N.Abs "@s" $ N.Abs "@z" inner
@@ -32,12 +32,10 @@ termToNamed term =
                   (termToNamed m `N.App` N.Var "@s" `N.App` 
                     (termToNamed n `N.App` N.Var "@s" `N.App` N.Var "@z"))
     Mult m n -> N.Abs "@s" $ termToNamed m `N.App` (termToNamed n `N.App` N.Var "@s")
-    IsZero m -> termToNamed m `N.App` N.Abs "_" ff `N.App` tt
-  
+    IsZero m -> termToNamed m `N.App` N.Abs "_" ff `N.App` tt  
   where 
     tt = N.Abs "@x" (N.Abs "@y" (N.Var "@x"))
     ff = N.Abs "@x" (N.Abs "@y" (N.Var "@y"))
-
 
 termToBruijn :: Comonad m => m (Term m) -> B.BTerm
 termToBruijn = namedToBruijn . termToNamed

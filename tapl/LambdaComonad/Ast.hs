@@ -1,6 +1,6 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE InstanceSigs #-}
-module LambdaTyped.Ast(Type(..), Term(..), (<@>), Locator, Comonad(..), Meta(..), getLocal, dM, atLocal) where
+module LambdaComonad.Ast(Type(..), Term(..), (<@>), Locator, Comonad(..), Meta(..), getLocal, dM, atLocal) where
 
 import Control.Comonad.Env
 
@@ -22,13 +22,11 @@ type Locator a = (Env Meta (a (Env Meta)))
 getLocal :: Locator a -> Meta
 getLocal = ask
 
---Env Meta (Term (Env Meta))
-
 data Comonad m => Type m 
   = TyBool
   | TyUnit
   | TyNat
-  | m (Type m) :*: m (Type m)
+  | TyProd (m (Type m)) (m (Type m))
   | TyFunc (m (Type m)) (m (Type m))
   | TyAny 
 
@@ -41,7 +39,8 @@ data Comonad m => Term m
   | App (m (Term m)) (m (Term m))
   | Let String (m (Term m)) (m (Term m))
   | Pair (m (Term m)) (m (Term m))
-  | Fst (m (Term m)) | Snd (m (Term m)) 
+  | Fst (m (Term m)) 
+  | Snd (m (Term m)) 
   | If (m (Term m)) (m (Term m)) (m (Term m))
   | Var String
   | Sum (m (Term m)) (m (Term m))
@@ -54,7 +53,7 @@ instance Comonad m => Show (Type m) where
   show TyUnit = "Unit"
   show TyNat = "Nat"
   show TyAny = "Any"
-  show (a :*: b) =
+  show (TyProd a b) =
     let x = extract a
         y = extract b
     in "(" ++ show x ++ " * " ++ show y ++ ")"
@@ -69,7 +68,7 @@ instance Comonad m => Eq (Type m) where
   TyUnit == TyUnit = True
   TyNat == TyNat = True
   TyAny == TyAny = True
-  (a1 :*: b1) == (a2 :*: b2) =
+  (TyProd a1 b1) == (TyProd a2 b2) =
     extract a1 == extract a2 && extract b1 == extract b2
   (TyFunc a1 b1) == (TyFunc a2 b2) =
     extract a1 == extract a2 && extract b1 == extract b2
