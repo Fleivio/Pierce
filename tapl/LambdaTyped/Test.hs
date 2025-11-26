@@ -15,8 +15,8 @@ test = do
       typ = typechecks parsed
       named = termToNamed parsed
       nameless = termToBruijn parsed
-  print parsed
-  print typ 
+  -- print parsed
+  print typ
   let
     t1 = execWriter $ evalM Named.normalOrder (\a -> writer (a, [show a])) named
     t2 = execWriter $ evalM Bruijn.normalOrder (\a -> writer (a, [show a])) nameless 

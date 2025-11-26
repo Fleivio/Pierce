@@ -1,5 +1,6 @@
 {
 module LambdaTyped.Lexer(Token, TokenId(..), alexScanTokens) where
+import LambdaTyped.Ast
 }
 %wrapper "posn"
 $char = [a-z]
@@ -44,8 +45,8 @@ tokens :-
   "of"                 { tokenMk TK_OF }
   "|"                  { tokenMk TK_BAR }
 
-  $char+               { \i c -> tokenMk (TK_STRING c) i c}
-  $dig+               { \i c -> tokenMk (TK_NUM (read c)) i c}
+  $char+               { \i c -> tokenMk TK_STRING i c}
+  $dig+                { \i c -> tokenMk TK_NUM i c}
   "\n"                 ;
 
   .                    { \i c -> error $ "TOKEN ERROR: " ++ show c ++ "\nAt Position:" ++ show i }
@@ -54,8 +55,8 @@ tokens :-
 data TokenId
   = TK_LAM
   | TK_DOT
-  | TK_STRING String
-  | TK_NUM Int
+  | TK_STRING
+  | TK_NUM
   | TK_IS_ZERO
   | TK_LPAREN | TK_RPAREN
   | TK_LCBRACK | TK_RCBRACK  
@@ -70,9 +71,9 @@ data TokenId
   | TK_CASE | TK_OF | TK_BAR  
   deriving (Show, Eq)
 
-type Token = TokenId
+type Token = (TokenId, Meta)
 
 tokenMk :: TokenId -> AlexPosn -> String -> Token
-tokenMk a _ _ = a
+tokenMk a (AlexPn _ lin col) lit = (a, Meta lit lin col)
 
 } 
