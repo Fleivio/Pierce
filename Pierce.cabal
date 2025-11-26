@@ -17,6 +17,7 @@ library tapl
     base ^>=4.18.3.0
     , array
     , mtl
+    , comonad
   
   hs-source-dirs: tapl 
 
@@ -43,10 +44,17 @@ library tapl
     LambdaTyped.Parser
     LambdaTyped.Lexer
 
+    LambdaComonad.Ast
+    LambdaComonad.Convert
+    LambdaComonad.Typechecker
+    LambdaComonad.Parser
+    LambdaComonad.Lexer
+
   exposed-modules: 
     ArithUntyped.Test
     LambdaUntyped.Test
     LambdaTyped.Test
+    LambdaComonad.Test
 
 
 executable Pierce

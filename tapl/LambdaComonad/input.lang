@@ -1,0 +1,8 @@
+let double = \i:N. i * 2 in
+let succ = \i:N. i + 1 in
+let err = (\b:B. b) 0 in -- error
+let op = \i:N. double (succ i) in
+let appn = \f:N->N. \c:N. \x:N. if iszero c then x else f x in
+op if snd {true, 0}      -- error 
+  then 3
+  else 2
