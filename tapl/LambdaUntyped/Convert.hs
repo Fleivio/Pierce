@@ -5,19 +5,18 @@ import LambdaUntyped.Named as Named
 import LambdaUntyped.Bruijn
 
 import Data.List (subsequences)
-import Control.Monad.State
+import Control.Monad.Reader
 
 bruijnToNamed :: BTerm -> NTerm
-bruijnToNamed bterm = evalState (go bterm) 0
+bruijnToNamed bterm = runReader (go bterm) 0
   where
-    go :: BTerm -> State Int NTerm -- Keeps the current depth
+    go :: BTerm -> Reader Int NTerm -- Keeps the current depth
     go term =
       case term of
-        Index n -> gets (Var . genName . subtract n)
+        Index n -> asks (Var . genName . subtract n)
         BAbs body -> do
-          name <- gets (genName . succ)
-          body' <- withState succ (go body)
-          modify pred
+          name <- asks (genName . succ)
+          body' <- local succ (go body)
           pure $ Abs name body'
         BApp t1 t2 -> App 
                       <$> go t1 
@@ -25,15 +24,14 @@ bruijnToNamed bterm = evalState (go bterm) 0
     genName n = tail (subsequences ['a'..'z']) !! n
 
 namedToBruijn :: NTerm -> BTerm
-namedToBruijn term = evalState (go term) (Named.freeVars term)
+namedToBruijn term = runReader (go term) (Named.freeVars term)
     where
-      go :: NTerm -> State [String] BTerm
+      go :: NTerm -> Reader [String] BTerm
       go tr =
         case tr of
-          Var n      -> gets (Index . find n)
+          Var n      -> asks (Index . find n)
           Abs x body -> do
-            body' <- withState (x:) (go body)
-            modify tail
+            body' <- local (x:) (go body)
             pure $ BAbs body'
           App t1 t2  -> BApp 
                         <$> go t1 

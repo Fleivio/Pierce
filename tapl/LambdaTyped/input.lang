@@ -1,7 +1,6 @@
-def x = false;
-
-def y = true;
-
-def n = unit;
-
-def main = if x then n else unit;
+let double = \i:N. i * 2 in
+let succ = \i:N. i + 1 in
+let op = \i:N. double (succ i) in
+if iszero (op 0) 
+  then op 3
+  else op (fst {1, 2})

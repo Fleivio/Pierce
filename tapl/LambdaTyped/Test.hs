@@ -10,8 +10,8 @@ import Control.Monad.Writer
 
 test :: IO ()
 test = do 
-  let concrete = "def main = (\\x:U->U. \\y:B. if y then (x unit) else unit) (\\j:U. j) true;"
-      parsed = snd $ head $ parseString concrete
+  concrete <- readFile "tapl/LambdaTyped/input.lang"
+  let parsed = parseString concrete
       typ = typechecks parsed
       named = termToNamed parsed
       nameless = termToBruijn parsed

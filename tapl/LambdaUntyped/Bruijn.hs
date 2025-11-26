@@ -12,7 +12,7 @@ instance Show BTerm where
   show term =
     case term of
       Index ix    -> show ix
-      BAbs body -> "(\\." <> show body <> ")"
+      BAbs body -> "(\\" <> show body <> ")"
       BApp t1 t2  -> show t1 <> " " <> show t2 
 
 isValue :: BTerm -> Bool
