@@ -1,8 +1,7 @@
 let double = \i:N. i * 2 in
-let errtest = (\b:B. b) 0 in
+let errtest = (\b:B. b) true in
 let succ = \i:N. i + 1 in
 let op = \i:N. double (succ i) in
-let appn = \f:N->N. \c:N. \x:N. if iszero c then x else f x in
-op if snd {unit, 0}
-  then true
+op if snd {unit, false}
+  then 2
   else 2

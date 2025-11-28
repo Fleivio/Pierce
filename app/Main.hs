@@ -1,6 +1,6 @@
 module Main(main) where
 
-import LambdaComonad.Test
+import LambdaTyped.Test
 
 main :: IO ()
 main = test
